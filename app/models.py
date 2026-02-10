@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, Float, String
-from database import Base
+from app.database import Base
 from pydantic import BaseModel
 
 

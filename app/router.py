@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, Query
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
+import json
 
-from utils import get_db
-from models import SpimexTradingResult
+from app.utils import get_db
+from app.models import SpimexTradingResult
+from app.cache_redis import redis_client, get_ttl_until_1411
 
 router = APIRouter(tags=['Биржа'])
 
@@ -15,6 +17,12 @@ def get_last_trading_dates(db: Session = Depends(get_db)):
     1 ручка - задание "список дат последних торговых дней (фильтрация по кол-ву последних торговых дней)."
     - сделал список годов и сколько в каждом записей
     '''
+    cache_key = "trading_dates"
+    cached = redis_client.get(cache_key)
+    if cached:
+        print('работает редис')
+        return json.loads(cached)
+    
     query = db.query(SpimexTradingResult).order_by(SpimexTradingResult.year.desc())
     result = []
     year = 2026
@@ -26,6 +34,10 @@ def get_last_trading_dates(db: Session = Depends(get_db)):
         year -= 1
     if not result:
         raise HTTPException(status_code=404, detail="Данные не найдены")
+
+    ttl = get_ttl_until_1411()
+    redis_client.setex(cache_key, ttl, json.dumps(result))
+
     return result
 
 @router.get("/dynamics")

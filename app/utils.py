@@ -2,15 +2,12 @@ import redis
 from fastapi import Depends
 from datetime import datetime, timedelta
 
-from app.database import SessionLocal
+from app.database import async_session
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with async_session() as session:
+        yield session
 
 
 redis_client = redis.Redis(host='redis', port=6379, db=0)

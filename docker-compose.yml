@@ -1,39 +1,29 @@
-version: '3.10'
-
 services:
   app:
-    image: appfa
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_USER=postgres_user
-      - POSTGRES_PASSWORD=postgres_password
-      - POSTGRES_DB=postgres_db
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+    image: appfastapi
+    build: ./
     ports:
       - "8000:8000"
-    restart: always
-
-  postgres:
-    image: postgres:13
+    depends_on:
+      - db
+      - redis
+      
+  db:
+    image: postgres:16.11-alpine
     environment:
-      POSTGRES_USER: postgres_user
-      POSTGRES_PASSWORD: postgres_password
-      POSTGRES_DB: postgres_db
-    volumes:
-      - pg_data:/var/lib/postgresql/data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+  
     ports:
       - "5432:5432"
     restart: always
 
   redis:
-    image: redis:6
+    image: redis:8.0-alpine
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "6379:6379"
     restart: always
-
-volumes:
-  pg_data:

@@ -2,3 +2,5 @@
 /files/
 /__pycache__/
 DB.db
+/.vscode/
+/new_app/

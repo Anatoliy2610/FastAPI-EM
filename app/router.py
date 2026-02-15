@@ -4,9 +4,8 @@ from sqlalchemy.orm import Session
 from typing import Optional
 import json
 
-from app.utils import get_db
+from app.utils import get_db, redis_client, get_ttl_until_1411
 from app.models import SpimexTradingResult
-from app.cache_redis import redis_client, get_ttl_until_1411
 
 router = APIRouter(tags=['Биржа'])
 

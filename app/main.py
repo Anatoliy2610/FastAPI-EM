@@ -3,7 +3,7 @@ from app.router import router as main_router
 
 
 
-from app.database import Base, engine, SessionLocal
+from app.database import Base, engine
 
 
 Base.metadata.create_all(bind=engine)

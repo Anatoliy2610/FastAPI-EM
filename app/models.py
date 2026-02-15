@@ -21,6 +21,6 @@ class SpimexTradingResult(Base):
     id = Column(Integer, primary_key=True, index=True)
     year = Column(Float) # Год
     мonth_number = Column(Float) # Номер месяца
-    category = Column(String)
+    category = Column(String) # категория
     count_contracts = Column(Float) # 'Суммарное количество заключенных договоров во всех секциях, шт.'
     count_value_contracts = Column(Float) # 'Суммарный объем заключенных договоров во всех секциях, руб.'

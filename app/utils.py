@@ -2,11 +2,11 @@ import redis
 from fastapi import Depends
 from datetime import datetime, timedelta
 
-from app.database import async_session
+from app.database import async_session_maker
 
 
-async def get_db():
-    async with async_session() as session:
+async def get_async_db():
+    async with async_session_maker() as session:
         yield session
 
 

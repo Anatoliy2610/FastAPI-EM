@@ -1,5 +1,4 @@
 import redis
-from fastapi import Depends
 from datetime import datetime, timedelta
 
 from app.database import async_session_maker

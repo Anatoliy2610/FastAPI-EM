@@ -58,7 +58,7 @@ async def get_dynamics(year_first: Optional[float] = Query(None, description="Н
     result = query.all()
     return result
 
-#### переписать через select
+
 @router.get("/trading_results", response_model=List[TradingResultSchema])
 async def get_trading_results(db: AsyncSession = Depends(get_async_db)):
     # список последних торгов (фильтрация по oil_id, delivery_type_id, delivery_basis_id)

@@ -32,7 +32,6 @@ async def get_last_trading_dates(db: AsyncSession = Depends(get_async_db)):
     if not first_year or not last_year:
         raise HTTPException(status_code=404, detail="Данные не найдены")
     for year in range(int(first_year.year), int(last_year.year)):
-        print(first_year.year, last_year.year)
         query = await db.scalars(select(SpimexTradingResult).filter(SpimexTradingResult.year == year))
         data_year = query.all()
         result.append({f'year {year}': len(data_year)})

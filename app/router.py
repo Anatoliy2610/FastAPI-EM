@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
-from sqlalchemy.future import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List
 import json
@@ -24,14 +24,16 @@ async def get_last_trading_dates(db: AsyncSession = Depends(get_async_db)):
         return json.loads(cached)
     
     result = []
-    scalar_1 = await db.scalars(select(SpimexTradingResult).order_by(SpimexTradingResult.year.asc()).limit(1))
-    scalar_2 = await db.scalars(select(SpimexTradingResult).order_by(SpimexTradingResult.year.desc()).limit(1))
-    first_year = scalar_1.first()
-    last_year = scalar_2.first()
-
-    if not first_year or not last_year:
-        raise HTTPException(status_code=404, detail="Данные не найдены")
-    for year in range(int(first_year.year), int(last_year.year)):
+    query = await db.execute(
+        select(
+            func.min(SpimexTradingResult.year),
+            func.max(SpimexTradingResult.year)
+        )
+    )
+    first_year, last_year = query.first()
+    if not first_year:
+        return []
+    for year in range(int(first_year), int(last_year) + 1):
         query = await db.scalars(select(SpimexTradingResult).filter(SpimexTradingResult.year == year))
         data_year = query.all()
         result.append({f'year {year}': len(data_year)})
@@ -68,13 +70,8 @@ async def get_trading_results(db: AsyncSession = Depends(get_async_db)):
     '''
     query = await db.scalars(select(SpimexTradingResult).order_by(SpimexTradingResult.year.desc()).limit(1))
     year = query.first()
-
-    try:
-        query = await db.scalars(select(SpimexTradingResult).filter(SpimexTradingResult.year==year.year))
-        data_year = query.all()
-    except:
-        raise HTTPException(status_code=404, detail="Данные отсутствуют")
+    if not year:
+        return []
+    query = await db.scalars(select(SpimexTradingResult).filter(SpimexTradingResult.year==year.year))
+    data_year = query.all()
     return data_year
-
-
-
